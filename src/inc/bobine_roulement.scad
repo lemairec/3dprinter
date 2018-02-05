@@ -3,21 +3,24 @@ include <../config.scad>;
 608_r = 22.3/2;
 608_h = 8;
 bobine_h = 85;
-bobine_r = 51/2;
-e=3;
+bobine_r = 45/2;
+e=2;
 $fn=100;
 support_e = 0.25;
 
 module bobine_roulement(){
     difference(){
         union(){
-            cylinder(e, r= bobine_r);
             cylinder(bobine_h+2*e, r= 608_r+e);
-            translate([0,0,bobine_h+e])cylinder(e, r= bobine_r);
+            for(i = [0, bobine_h+e]){
+                translate([0,0,i])cylinder(e, r= bobine_r);
+            }
+            
         }
-        translate([0,0,-1])cylinder(bobine_h+4*e, r=7);
-        translate([0,0,-1])cylinder(608_h+1, r=608_r);
-        translate([0,0,bobine_h+2*e-608_h])cylinder(608_h+1, r=608_r);
+        translate([0,0,-1])cylinder(bobine_h+4*e, r=8);
+        for(i = [-1,bobine_h+2*e-608_h]){
+            translate([0,0,i])cylinder(608_h+1, r=608_r);
+        }
     }
 }
 
@@ -35,4 +38,4 @@ module support(){
 
 
 translate([0,0,0]) bobine_roulement();
-support();
+//support();

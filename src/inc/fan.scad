@@ -1,4 +1,4 @@
-include <config.scad>
+include <../config.scad>
 
 fan_40_d = 31;
 module fan_40(){
