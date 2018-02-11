@@ -1,9 +1,10 @@
 include <config.scad>
 
 e =3;
+$fn=100;
 
 module z_stop(){
-    vis_ecart = 30;
+    vis_ecart = 20;
     h = 15;
     difference(){
         union(){

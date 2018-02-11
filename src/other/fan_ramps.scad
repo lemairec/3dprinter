@@ -1,6 +1,6 @@
 include <fan.scad>
 
-e = 3;
+e = 2;
 l= 40;
 h = 50;
 
@@ -8,8 +8,8 @@ r = 5;
 
 $fn = 100;
 module fan_ramp1(){
-    l2 = l + 10;
-    e_cube = 4.5;
+    l2 = l + 20;
+    e_cube = 6;
     difference(){
         union(){
             hull(){
@@ -63,10 +63,10 @@ module fan_ramp2(){
     %translate([fan_x, fan_r/2 + fan_y, -12])rotate([90,0,0])fan_40();
 }
 
-if(true){
+if(false){
     fan_ramp1();
     translate([0,0,h+r]) rotate([0,180,0])fan_ramp2();
 } else {
-    //translate([0,-20,0])fan_ramp1();
-    fan_ramp2();
+    translate([0,-20,0])fan_ramp1();
+    //fan_ramp2();
 }

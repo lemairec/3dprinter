@@ -244,3 +244,10 @@ module cran_y_vis(_l, e, cran, type_vis = 3, trous = [0.1, 0.5, 0.9]){
 module cran_y_nuts(_l, e, cran, type_vis = 3, trous = [0.1, 0.5, 0.9]){
     translate([0, _l]) rotate([0, 0, -90]) cran_x_nuts(_l, e, cran, type_vis, trous);
 }
+
+
+module fixation_2d(){
+    translate([-5,0])square([2,4], center=true);
+    translate([5,0])square([2,4], center=true);
+}
+

@@ -11,7 +11,7 @@ e = 4.5;
 cran = 20;
 vis_fixation = 4;
 
-angle = 20;
+angle = 25;
 h_front = h/cos(angle);
 dh_front = e*sin(angle);
 
@@ -22,7 +22,7 @@ r_disque2 = 130;
 
 h_bobine = h2-r_disque2;
 x_bobine = -lg/2+r_disque2;
-r_tige = 4.1;
+r_tige = 5.1;
 
 /**
  * top bottom
@@ -139,8 +139,8 @@ module right(){
     difference(){
         left_right();
         hull(){
-        translate([lg/2-60,30]) circle(7);
-            translate([lg/2-60,40]) circle(7);
+        translate([lg/2-60,0]) circle(7);
+            translate([lg/2-60,30]) circle(7);
         }
     }
 }
@@ -182,7 +182,7 @@ if(false){
     e= 10;
     translate([-l/2, -20])plaque(456, 609);
     left();
-    translate([0,h+22])left();
+    translate([0,h+22])right();
     //back(); 
     translate([456+10,0]){
         translate([-l/2, -20])plaque(456, 609);

@@ -1,9 +1,9 @@
 $fn=100;
 
-include <config.scad>
-use <alim_atx.scad>
-use <z.scad>
-use <corner_roulement.scad>
+include <../config.scad>
+use <../inc/alim_atx.scad>
+use <../z.scad>
+use <../corner_roulement.scad>
 use <imprimante_2d_top.scad>
 
 
@@ -47,16 +47,17 @@ y = -108;
 int_front = 70;
 
 
-/*use <xy_2.scad>
+
+
+use <../xy.scad>
+xy_dh = 39;
+xy_dx = nema_dx;
+
+/*use <../xy_in.scad>
 xy_dh = 19;
 xy_dx = 18;
 nema_dx = 36;
 motor2 = false;*/
-
-use <xy.scad>
-xy_dh = 39;
-xy_dx = nema_dx;
-
 
 roul_x = lg/2-nema_dx -roul_dx;
 
@@ -93,25 +94,10 @@ module bouton_2d(pin = true){
 
 module passe_fil_2d(){
     hull(){
-        translate([-5,0])circle(r=5);
-        translate([5,0])circle(r=5);
+        translate([-5,0])circle(r=6);
+        translate([5,0])circle(r=6);
     }
 }
-
-module fixation_2d(){
-    translate([-5,0])square([2,4], center=true);
-    translate([5,0])square([2,4], center=true);
-}
-
-module fixation_mega_2d(){
-    translate([-40,48/2+5])rotate([0,0,90])fixation_2d();
-    translate([35,48/2+5])rotate([0,0,90])fixation_2d();
-    translate([-40-7,-48/2-5])rotate([0,0,90])fixation_2d();
-    translate([35,-48/2-5])rotate([0,0,90])fixation_2d();
-}
-
-
-
 
 module alim_2d_l(){
     for(i = [0,1]){
@@ -490,9 +476,9 @@ module test(){
 }
 
 
-if(false){
-    translate([0,0,-h2/2]) full_imprimante_3d(e, 2);
-    translate([0,0,-h2/2 + h]) rotate([0,0,180])imprimante_3d_top(e);
+if(true){
+    translate([0,0,-h2/2]) full_imprimante_3d(e, 3);
+    //translate([0,0,-h2/2 + h]) rotate([0,0,180])imprimante_3d_top(e);
     
 } else {
     e1 = 10;
