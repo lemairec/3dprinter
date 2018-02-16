@@ -1,10 +1,12 @@
 include <config.scad>
-include <other/jhead.scad>
-use <inc/fan.scad>
+include <inc/jhead.scad>
+use <other/fan_head.scad>
 
-LM10UU_l = 29;
+resolution = 4; $fs=$fs/resolution; $fa=$fa/resolution;
+
+LM10UU_l = 29.5;
 LM10UU_r = 19/2;
-e = 2.5;
+e = 2;
 LM10UU_re = LM10UU_r+e;
 LM10UU_rouv = LM10UU_r-0.5;
 
@@ -16,7 +18,7 @@ lg_xy = 40;
 
 //tige_esp = l_xy - 2*e -2*tige_r;
 tige_esp = 80;
-$fn=50;
+
 
 module titan_extruder(){
     translate([0, 0, 10])rotate([0,180,0]) jhead();
@@ -48,19 +50,23 @@ module LMUU_OUT_in(buttom = 0, top = 0, e_h=1){
 }
 
 
-module LMUU_OUT_diff(buttom = 0, top = 0, e_h=1){
+module LMUU_OUT_diff(buttom = 0, top = 0, e_h = 1, top_ = true){
     l = buttom + LM10UU_l + top;
+    d_h = 2.5;
     translate([0,0,buttom]) difference(){
-        translate([0,0,-e_h/2]) cylinder(LM10UU_l+e_h, r=LM10UU_r);
-        translate([-6,-LM10UU_r,-10]) cube([12,2,10]);
-        translate([-6,-LM10UU_r,LM10UU_l]) cube([12,2,1+e_h/2]);
+        translate([0,0,-e_h/2]) cylinder(LM10UU_l+e_h+top, r=LM10UU_r);
+        translate([-6,-LM10UU_r,-10]) cube([12,d_h,10]);
+        translate([-6,-LM10UU_r,LM10UU_l]) cube([12,d_h,1+top+e_h/2]);
     }
     translate([-LM10UU_rouv,0,-1])cube([LM10UU_rouv*2,30,l+2]);
     translate([-l/2,LM10UU_r+2,LM10UU_l/2 + buttom])rotate([0,90,0])m3(l);
     %translate([-l/2,LM10UU_r+2,LM10UU_l/2 + buttom])rotate([0,90,0])m3(l);
     
-    translate([0,0,-1]) cylinder(buttom+2, r=tige_r+1);
-    translate([0,0,buttom+ LM10UU_l+ e_h/2 + 0.3]) cylinder(top+2, r=tige_r+1);
+    if(top_){
+        translate([0,0,-1]) cylinder(buttom+0.5-0.3, r=tige_r+1);
+    } else {
+        translate([0,0,-1]) cylinder(buttom+1, r=tige_r+1);    
+    }
     %translate([0,0,buttom]) cylinder(LM10UU_l, r=LM10UU_r);
 }
 
@@ -68,9 +74,6 @@ module LMUU_OUT(){
     difference(){
         LMUU_OUT_in(h);
         LMUU_OUT_diff(h);
-        
-        
-        
     }
 
 }
@@ -84,7 +87,7 @@ module corner(){
 	x = de + 2*tige_r+e;
     
     l = tige_esp + 2*(tige_r + e);
-    r =3;
+    r = 3;
     
     demi_h = l/2 - LM10UU_l -2;
 	difference(){
@@ -95,22 +98,21 @@ module corner(){
                 translate([lg_xy, h-r, -l/2]) cylinder(l, r=3);
                 translate([0,h-r,  -l/2]) cylinder(l, r=3);
             }
-            LMUU_OUT_in(2, demi_h);
-            mirror([0,0,1]) LMUU_OUT_in(2, demi_h);
-            
+            for(i=[0,1]){
+                mirror([0,0,i]) LMUU_OUT_in(2, demi_h);
+            }
         }
-        
-        LMUU_OUT_diff(2, demi_h);
-        translate([0,0, -l/2]) LMUU_OUT_diff(demi_h,2);
-        
+
+        for(i=[0,1]){
+            mirror([0,0,i]) translate([0,0, -l/2]) LMUU_OUT_diff(demi_h, 2, 1, i);
+        }
+        //translate([0,0, -l/2]) LMUU_OUT_diff(demi_h,2);
 
         translate([17, 0, 0]) rotate([90,0,0]) cylinder(100, r=1.6, center = true);
         translate([0, -2*tige_r-1, -tige_esp/2]) rotate([90,0,90]) cylinder(100, r=tige_r, center = true);
         translate([0, -2*tige_r-1, tige_esp/2]) rotate([90,0,90]) cylinder(100, r=tige_r, center = true);
     }
-    echo(tige_esp)
-    translate([-10, -10, LM10UU_l+2.3]) cube([20,10, 0.3]);
-    
+    //translate([-10, -10, LM10UU_l+2.3]) cube([20,10, 0.3]);
 }
 
 module middle(){
@@ -183,9 +185,10 @@ module middle2(fan = true){
             translate([tige_esp/2, 0, -lg/2]) LMUU_OUT_in(lg_d-0.5, 0.5);
             translate([-tige_esp/2, 0, -lg/2]) LMUU_OUT_in(lg/2, lg_d);
 		}
-        translate([tige_esp/2, 0, 0]) LMUU_OUT_diff(0.5,lg_d-0.5);
-        translate([tige_esp/2, 0, -lg/2]) LMUU_OUT_diff(lg_d-0.5, 0.5);
-        translate([-tige_esp/2, 0, -lg/2]) LMUU_OUT_diff(lg/2, lg_d);
+        for(i=[0,1]){
+            mirror([0,0,i])translate([tige_esp/2, 0, 0]) LMUU_OUT_diff(0.5,2,2);
+        } 
+        translate([-tige_esp/2, 0, -lg/2]) LMUU_OUT_diff(lg/2, lg_d, 1, false);
         
         
         translate([0,-10,lg/2 - 4]) rotate([90,0,0]) cylinder(r = 4, 14);
@@ -259,7 +262,7 @@ module radial_fan_out(){
     }
 }
 
-i = 0;
+i = 1;
 if(i == 0){
     xy(200);
 } else if(i == 1){
