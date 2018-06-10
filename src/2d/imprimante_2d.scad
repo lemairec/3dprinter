@@ -2,34 +2,38 @@ $fn=100;
 
 include <../config.scad>
 use <../inc/alim_atx.scad>
+use <../inc/mega_ramps.scad>
 use <../z.scad>
 use <../corner_roulement.scad>
 use <imprimante_2d_top.scad>
 
 
-
+vis_fixation = 4;
 e = 6; //2.74
 cran = 25;
-
-top_int = 240;
-top_int_r = 20;
 
 l = 440;
 lg = 420;
 
 h1 = 110;
-h2 = 445-e;
+h2 = 440;
 h = 500;
 
+top_int = 240;
+top_int_r = 20;
+top_int_h = h1 + 10 + top_int_r + e;
+
 poignee = true;
+
+fenetre = true;
+fenetre_l = 240;
+fenetre_r = 20;
+fenetre_h = h1 + 10 + fenetre_r + e;
 
 r_glis = 5.0;
 h_glis = 32;
 
-vis_fixation = 4;
-
 z_axe_dist = 310;
-    
 
 r_tige = 4.9;
 tige_fixation = 30;
@@ -44,7 +48,10 @@ fixation_x = 45;
 x = -100;
 y = -108;
 
-int_front = 70;
+porte_b = false;
+porte_int = top_int+2*20;
+porte_r = 20;
+porte_angle = 0;
 
 
 
@@ -92,10 +99,10 @@ module bouton_2d(pin = true){
     }
 }
 
-module passe_fil_2d(){
+module passe_fil_2d(r = 5){
     hull(){
-        translate([-5,0])circle(r=6);
-        translate([5,0])circle(r=6);
+        translate([-5,0])circle(r=r);
+        translate([5,0])circle(r=r);
     }
 }
 
@@ -129,11 +136,7 @@ module top_bottom(vis){
             mirror([i,0,0]) translate([-l/2 -1, -lg/2])
                 cran_y_nuts(lg, e + 1, cran, vis_fixation, [0.25, 0.75]);
         }
-        for(i = [-1,1]){
-            for(j = [-1,1]){
-                translate([i*(l/2-e-48), j*(lg/2 - e - 35)]) rotate([0,0,90]) passe_fil_2d();
-            }
-        }
+        
     }
 }
 
@@ -159,7 +162,13 @@ module top(){
             mirror([i,0,0]) translate([l/2- nema_dx -e - 5, lg/2 - e - 13]) hull(){
                 circle(5);
             }
-        }         
+        }
+
+        //passe fils
+        translate([0, (lg/2 - e - 20)]) rotate([0,0,0]) passe_fil_2d(5);
+        for(i=[-1,1]){
+            translate([i*(l/2-e-1), 0]) rotate([0,0,90]) passe_fil_2d();
+        }
     }
 }
 
@@ -173,18 +182,23 @@ module bottom(){
         
         //translate([0, lg/2-e])rotate([0,0,180])alim_2d_l();
         
-        translate([ 50,  0]) circle(5);
-        translate([ 0,  -lg/2+80]) fixation_mega_2d();
+        //translate([ 50,  0]) circle(5);
         
+        //passe fils
+        translate([0, (lg/2 - e - 20)]) rotate([0,0,0]) passe_fil_2d(7);
+        for(i=[-1,1]){
+            translate([i*(l/2-e-45), -(lg/2 - e - 20)]) passe_fil_2d();
+            translate([-1*(l/2-e-45), (lg/2 - e - 20)]) rotate([0,0,0]) passe_fil_2d();
+        }
+        
+        //fixation
         for(r=[0,90,180,270]){
             rotate([0,0,r])translate([ 70,  0]) fixation_2d();
         }
-        
         translate([ -l/4-20,  -lg/2+80]) rotate([0,0,90])fixation_2d();
         translate([ l/4+20,  -lg/2+80]) rotate([0,0,90])fixation_2d();
         translate([ -l/4-20,  lg/2-80]) rotate([0,0,90])fixation_2d();
         //translate([ l/4+20,  lg/2-80]) rotate([0,0,90])fixation_2d();
-        
     }
 }
 
@@ -226,8 +240,8 @@ module front(){
         front_back();
         
         hull(){
-             translate([-top_int/2, h1+20+e+10])circle(top_int_r);
-            translate([+top_int/2, h1+20+e+10])circle(top_int_r);
+             translate([-top_int/2, top_int_h])circle(top_int_r);
+            translate([+top_int/2, top_int_h])circle(top_int_r);
             translate([-top_int/2, 2*h])circle(top_int_r);
             translate([+top_int/2, 2*h])circle(top_int_r);
         }
@@ -249,6 +263,14 @@ module back(){
             translate([l/4,h])circle(20);
         }
         
+        translate([ 0, h1+100]) rotate([0,0,-90])fixation_mega_2d();
+        for(r=[0,180]){
+            translate([ 0,  h1+(h2-h1)/2]) rotate([0,0,r])translate([ 90,  0]) fixation_2d();
+        }
+        translate([ 0,  h1+(h2-h1)*3/4]) fixation_2d();
+        translate([ 0,  h2-30]) fixation_2d();
+        translate([ 40,  h1+(h2-h1)*3/4]) fixation_2d();
+        translate([ -40,  h1+(h2-h1)*3/4]) fixation_2d();
         for(i = [0,1]){
             mirror([i,0,0]) translate([roul_x - 16.5, h2+e+11.5]) circle(1.5);
             mirror([i,0,0]) translate([roul_x + 16.5, h2+e+11.5]) circle(1.5);
@@ -280,6 +302,22 @@ module left_right(){
             }
         }
         
+        for(i=[-1,-2,1,2]){
+            translate([i/6*lg,  h2 - 10]) rotate([0,0,90])fixation_2d();
+        }
+        translate([0,  h2 + 20]) rotate([0, 0, 0])fixation_2d();
+        
+        
+        if(fenetre){
+            hull(){
+                translate([-fenetre_l/2, h2 - 80])circle(fenetre_r);
+                translate([fenetre_l/2, h2 - 80])circle(fenetre_r);
+                
+                translate([-fenetre_l/2, fenetre_h])circle(fenetre_r);
+                translate([fenetre_l/2, fenetre_h])circle(fenetre_r);
+            }
+        }
+        
         for(i=[0,1]){
             mirror([i,0,0]) translate([-lg/2,0]) cran_y(h, e, cran, false);
         }
@@ -291,6 +329,7 @@ module left_right(){
 
 module left(){
     left_right();
+    
 }
 
 module right(){
@@ -355,10 +394,10 @@ module plateau(){
 
 module porte(){
     hull(){
-        translate([-lg/2+int_front - 5, h1+20+e+10 - 5])circle(20);
-        translate([lg/2-int_front + 5, h1+20+e+10 - 5])circle(20);
-        translate([-lg/2+int_front - 5, h2-(20+10) + 5])circle(20);
-        translate([lg/2-int_front + 5, h2-(20+10) + 5])circle(20);
+        translate([-porte_int/2, h1+20+e+10 - 5])circle(porte_r);
+        translate([porte_int/2, h1+20+e+10 - 5])circle(porte_r);
+        translate([-porte_int/2, h2-(20+10) + 5])circle(porte_r);
+        translate([porte_int/2, h2-(20+10) + 5])circle(porte_r);
     }
 }
 
@@ -392,7 +431,7 @@ module full_imprimante_3d(e2 = e, etape = 0){
     color_1 = (etape == 1) ? [0,0,1,1] : [0,0,1,0.4];
     color_2 = (etape == 2) ? [0,0,1,1] : [0,0,1,0.4];
     color_3 = "gold";
-     color_4 = "gold";
+    color_4 = "gold";
 
     
     echo(l_xy);
@@ -421,7 +460,7 @@ module full_imprimante_3d(e2 = e, etape = 0){
     if(etape>=3){
         color(color_3) imprimante_3d_etape3(e2);
         translate([l/2-e,lg/2-100, h1]) rotate([0,180,90])alim_atx_3d();  
-        
+        translate([l/2-e,lg/2-100, h1-3]) rotate([0,0,90])alim_atx_support();  
     }
     
         
@@ -429,7 +468,7 @@ module full_imprimante_3d(e2 = e, etape = 0){
         h = h1 + 55;
         
         for(i = [0,1]){
-            mirror([i,0,0])translate([-z_axe_dist/2, 0, h]) rotate([-180,0,-90]) z();
+            mirror([i,0,0])translate([-z_axe_dist/2, 0, h]) rotate([-180,0,90]) z();
             %mirror([i,0,0]) translate([-z_axe_dist/2, 0, h1]) cylinder(r=r_tige, l_tige_z);
             %mirror([i,0,0]) translate([ z_axe_dist/2, -80, h1]) cylinder(r=r_tige, l_tige_z);
             %mirror([i,0,0]) translate([ z_axe_dist/2, 80, h1]) cylinder(r=r_tige, l_tige_z);
@@ -448,10 +487,10 @@ module full_imprimante_3d(e2 = e, etape = 0){
         %translate([-l_xy/2, 0,h2 + xy_dh + e]) rotate([-90,0,0])cylinder(r=r_tige, l_tige_y,center=true);
         %translate([l_xy/2, 0,h2 + xy_dh + e]) rotate([-90,0,0])cylinder(r=r_tige, l_tige_y, center=true);
         
-        
-        y_porte = -lg/2+int_front - 5 -20;
-        angle = 40;
-        //%translate([y_porte,-lg/2    ,0])rotate([90,0,-angle]) translate([-y_porte, 0])linear_extrude(e2) porte();
+        if(porte_b){
+            porte_y = -porte_int/2-porte_r-e;
+            %translate([porte_y,-lg/2    ,0])rotate([90,0,-porte_angle]) translate([-porte_y, 0])linear_extrude(e2) porte();
+        }
     }
     
     
@@ -477,7 +516,8 @@ module test(){
 
 
 if(true){
-    translate([0,0,-h2/2]) full_imprimante_3d(e, 3);
+    translate([0,0,-h2/2]) full_imprimante_3d(e, 1);
+    //back();
     //translate([0,0,-h2/2 + h]) rotate([0,0,180])imprimante_3d_top(e);
     
 } else {

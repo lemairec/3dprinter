@@ -7,7 +7,7 @@ lg = 420;
 h = 400;
 h2 = h-10;
 
-e = 4.5;
+e = 6;
 cran = 20;
 vis_fixation = 4;
 

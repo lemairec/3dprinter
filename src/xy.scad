@@ -115,65 +115,16 @@ module corner(){
     //translate([-10, -10, LM10UU_l+2.3]) cube([20,10, 0.3]);
 }
 
-module middle(){
+
+module middle_common(x_extrude){
     lg_d = 2;
 	lg = 2*LM10UU_l+2*lg_d;
 	h=3;
 	x = 6 + LM10UU_r;
 	l = tige_esp+ 15;
     pt_fan_radial = [-tige_esp/2-12,-12,-lg/2];
-    pt_fan = [0,-13+27,-lg/2];
-    fan_40_d = 31;
-    difference(){
-        union(){
-            translate([-l/2,-13,-lg/2]) cube([l, h, lg]);
-            translate([tige_esp/2+17-40,-13,-lg/2]) cube([40, h, lg+10]);
-            translate(pt_fan_radial) cylinder(25, r=5);
-            mirror([0,0,1]) translate([-l/2,-13,-lg/2]) cube([l, 22, 8]);
-            mirror([0,0,0]) translate([-l/2,-13,-lg/2]) cube([l, 22, 8]);
-            mirror([0,0,0]) translate(pt_fan) cube_arrondi(40, 40, 8);
-            translate([tige_esp/2, 0, 0]) LMUU_OUT_in(0.5,lg_d-0.5);
-            translate([tige_esp/2, 0, -lg/2]) LMUU_OUT_in(lg_d-0.5, 0.5);
-            translate([-tige_esp/2, 0, -lg/2]) LMUU_OUT_in(lg/2, lg_d);
-		}
-            translate([tige_esp/2, 0, 0]) LMUU_OUT_diff(0.5,lg_d-0.5);
-            translate([tige_esp/2, 0, -lg/2]) LMUU_OUT_diff(lg_d-0.5, 0.5);
-            translate([-tige_esp/2, 0, -lg/2]) LMUU_OUT_diff(lg/2, lg_d);
-        for(i = [0,1]){
-                mirror([0,0,i]) translate([0,-50,lg/2 - 4]) rotate([-90,0,0]) m3(100);
-        }
-        
-        for(i=[-1,1]){
-            translate(pt_fan) translate([i*fan_40_d/2, -fan_40_d/2, -1 ]) m3(14);
-            translate(pt_fan) translate([i*fan_40_d/2, +fan_40_d/2, -1 ]) m3(14);
-        }
-        translate(pt_fan)translate([0, 0, -1]) cylinder(20, r = 18);
-        
-        translate(pt_fan_radial) m3(100);
-        translate([0,-10,lg/2 - 4]) rotate([90,0,0]) cylinder(r = 4, 14);
-        
-        rotate([90,0,0]) cylinder(100, r=15);
-        translate([0,-15,0]) rotate([90,0,0]) titan_extruder();
-        
-	}
-    %translate([0,-13,0]) rotate([90,0,0]) titan_extruder();
-    //%translate(pt_fan) rotate([90,0,0]) fan_40();
-    
-    %translate([-tige_esp/2-13, 35, -5]) mirror([1,0,0])rotate([90,0,-8]) fan_radial();
-}
-
-h_fan = 44;
-module middle2(fan = true){
-    lg_d = 2;
-	lg = 2*LM10UU_l+2*lg_d;
-	h=3;
-	l = tige_esp+ 15;
-    x_extrude = 6.5;
-    x_fan = -17.5;
-    
     pt_fan = [x_extrude,-13+27,-lg/2];
     fan_40_d = 31;
-    
     difference(){
         union(){
             translate([-l/2,-13,-lg/2]) cube([l, h, lg]);
@@ -203,8 +154,53 @@ module middle2(fan = true){
         translate(pt_fan)translate([0, 0, -1]) cylinder(20, r = 18);
          
         translate([x_extrude, 0, 0]) rotate([90,0,0]) cylinder(100, r=14);
-        translate([x_extrude,-15,0]) rotate([90,0,0]) titan_extruder();
-        
+        translate([x_extrude,-15,0]) rotate([90,0,0]) titan_extruder();        
+	}
+}
+
+module middle(){
+    lg_d = 2;
+	lg = 2*LM10UU_l+2*lg_d;
+	h=3;
+	x = 6 + LM10UU_r;
+	l = tige_esp+ 15;
+    pt_fan_radial = [-tige_esp/2-12,-12,-lg/2];
+    pt_fan = [0,-13+27,-lg/2];
+    fan_40_d = 31;
+    
+    difference(){
+        union(){
+            middle_common(0);
+            for(i=[0]){
+                mirror([i,0,0]) translate(pt_fan_radial) cylinder(25, r=5);
+            }
+        }
+        for(i=[0]){
+            mirror([i,0,0]) translate(pt_fan_radial) m3(100);
+            translate(pt_fan_radial) m3(100);
+        }
+	}
+    %translate([0,-13,0]) rotate([90,0,0]) titan_extruder();
+    //%translate(pt_fan) rotate([90,0,0]) fan_40();
+    
+    %translate([-tige_esp/2-13, 35, -5]) mirror([1,0,0])rotate([90,0,-8]) fan_radial();
+}
+
+h_fan = 44;
+module middle2(fan = true){
+    lg_d = 2;
+	lg = 2*LM10UU_l+2*lg_d;
+	h=3;
+	l = tige_esp+ 15;
+    x_extrude = 7;
+    x_fan = -17.5;
+    
+    pt_fan = [x_extrude,-13+27,-lg/2];
+    fan_40_d = 31;
+    
+            
+    difference(){
+        middle_common(x_extrude); 
         translate([x_fan-7.5,-50,-10]) cube([15,100,20]);
         
         translate([x_fan, -0, -17]) rotate([90,0,0]) m3(100);
@@ -262,13 +258,14 @@ module radial_fan_out(){
     }
 }
 
-i = 1;
+i = 3;
 if(i == 0){
     xy(200);
 } else if(i == 1){
     corner();
 } else if(i == 2){
-    middle2(true);
+    middle(true);
+    //middle();
 } else if(i == 3){
     support_fan_radial();
 } else if(i == 4){

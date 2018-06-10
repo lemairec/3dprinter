@@ -1,4 +1,5 @@
-include <fan.scad>
+include <../config.scad>
+include <../inc/fan.scad>
 
 fan_nut_x = 17;
 e_fan = 2;
@@ -51,5 +52,5 @@ module vent_fan_radial(h){
         translate([fan_nut_x,0,-10]) m3(20);
     }
 }
-//support_fan_radial();
+support_fan_radial();
 vent_fan_radial(20);

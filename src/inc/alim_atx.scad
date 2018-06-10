@@ -72,4 +72,38 @@ module alim_atx_support(){
     %translate([0, 0, alim_atx_h+e]) rotate([0,180,0])alim_atx_3d();
 }
 
-alim_atx_support();
+module alim_atx_support2(){
+    difference(){
+        union(){
+            hull(){
+                translate([-lg/2-e1, l-8+e, 0])cylinder(e, r=8);
+                translate([+lg/2-2, l-16+e, 0])cube([2,16,e]);
+            }
+            translate([-lg/2-e, l,0]) cube([lg+e, e, h]);
+            
+            translate([-lg/2-e, 0,0]) cube([ e, l+e, h]);
+            translate([-lg/2- e, 0,0]) cube([ h, l+e, e]);
+                
+            translate([-lg/2, 0, 0]) hull(){
+                translate([-e, 0, 0])cube([ e, e, h]);
+                translate([-h, 0, h/2]) rotate([-90,0,0])cylinder(e, r=h/2);
+            }
+            
+            translate([lg/2-e, l, 0]) rotate([0,0,-90]) hull(){
+                translate([-e, 0, 0])cube([ e, e, h]);
+                translate([-h, 0, h/2]) rotate([-90,0,0])cylinder(e, r=h/2);
+            }
+            
+        }
+        translate([-lg/2-e1, l-8+e, -1]) cylinder(e+2, r=4);
+        translate([+lg/2+e1, l-8+e, -1]) cylinder(e+2, r=4);
+        
+        translate([-lg/2 - h, -1, h/2]) rotate([-90,0,0])cylinder(e+2, r=2);
+        translate([lg/2+50, l+h , h/2]) rotate([0,-90,0])cylinder(100, r=2);
+    }
+    %translate([0, 0, alim_atx_h+e]) rotate([0,180,0])alim_atx_3d();
+}
+
+//alim_atx_support();
+
+alim_atx_support2();

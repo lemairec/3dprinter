@@ -1,11 +1,14 @@
 include <config.scad>
-include <other/jhead.scad>
-use <fan.scad>
-use <xy.scad>
+include <inc/jhead.scad>
+use <other/fan_head.scad>
 
-LM10UU_l = 30;
-LM10UU_r = 20/2;
-e = 3;
+LM10UU_l = 29;
+LM10UU_r = 19/2;
+e = 2.5;
+LM10UU_re = LM10UU_r+e;
+LM10UU_rouv = LM10UU_r-0.5;
+
+
 tige_r = 5;
 
 l_xy = 2*(e + 2*tige_r+LM10UU_l);
@@ -13,7 +16,7 @@ lg_xy = 40;
 
 //tige_esp = l_xy - 2*e -2*tige_r;
 tige_esp = 80;
-
+$fn=50;
 
 module titan_extruder(){
     translate([0, 0, 10])rotate([0,180,0]) jhead();
@@ -29,28 +32,54 @@ module LMUU(){
 	cylinder(LM10UU_l, r=LM10UU_r);
 }
 
-module LMUU_OUT(){
-    difference(){
-        LMUU_OUT_in(10, 10);
-        LMUU_OUT_diff(10, 10);
-        
-        
+
+LMUU_h = 1;
+module LMUU_OUT_in(buttom = 0, top = 0, e_h=1){
+    l = buttom + LM10UU_l + top;
+     union(){
+        cylinder(l , r=LM10UU_re);
+        translate([0,0,buttom]) hull(){
+            translate([0,LM10UU_re,LM10UU_l/2])
+                rotate([0,90,0])cylinder(2*(LM10UU_re), r=2+e, center = true);
+            translate([-(LM10UU_re),0,0])cube([2*(LM10UU_re), 6, LM10UU_l]);
+        }
         
     }
-
 }
 
 
+module LMUU_OUT_diff(buttom = 0, top = 0, e_h=1){
+    l = buttom + LM10UU_l + top;
+    translate([0,0,buttom]) difference(){
+        translate([0,0,-e_h/2]) cylinder(LM10UU_l+e_h, r=LM10UU_r);
+        translate([-6,-LM10UU_r,-10]) cube([12,2,10]);
+        translate([-6,-LM10UU_r,LM10UU_l]) cube([12,2,1+e_h/2]);
+    }
+    translate([-LM10UU_rouv,0,-1])cube([LM10UU_rouv*2,30,l+2]);
+    translate([-l/2,LM10UU_r+2,LM10UU_l/2 + buttom])rotate([0,90,0])m3(l);
+    %translate([-l/2,LM10UU_r+2,LM10UU_l/2 + buttom])rotate([0,90,0])m3(l);
+    
+    translate([0,0,-1]) cylinder(buttom+2, r=tige_r+1);
+    translate([0,0,buttom+ LM10UU_l+ e_h/2 + 0.3]) cylinder(top+2, r=tige_r+1);
+    %translate([0,0,buttom]) cylinder(LM10UU_l, r=LM10UU_r);
+}
+
+module LMUU_OUT(){
+    difference(){
+        LMUU_OUT_in(h);
+        LMUU_OUT_diff(h);
+    }
+}
 
 lg_xy = 40;
-module corner(){
-    
+module corner(){   
     h = 28;
 	x = e + 2*tige_r;
     
     l = tige_esp + 2*(tige_r + e);
     button = (l - 2*LM10UU_l)/4;
     r =3;
+	demi_h = l/2 - LM10UU_l -4;
 	difference(){
         union(){
             translate([-10, -h]) hull(){
@@ -59,15 +88,15 @@ module corner(){
                 translate([lg_xy, h-r, -l/2]) cylinder(l, r=3);
                 translate([0,h-r,  -l/2]) cylinder(l, r=3);
             }
-            rotate([0,0,90]) translate([0,0,0])LMUU_OUT_in(button, button);
-            mirror([0,0,1]) rotate([0,0,90]) translate([0,0,0])LMUU_OUT_in(button, button);
+            LMUU_OUT_in(4, demi_h);
+            mirror([0,0,1]) LMUU_OUT_in(4, demi_h);
         }
         
-        rotate([0,0,90]) translate([0,0,0])LMUU_OUT_diff(button, button);
-        mirror([0,0,1]) rotate([0,0,90]) translate([0,0,0])LMUU_OUT_diff(button, button);
-        
+        LMUU_OUT_diff(4, demi_h);
+        translate([0,0, -l/2]) LMUU_OUT_diff(demi_h,4);
+       
 
-        translate([0, 0, -1]) rotate([90,0,0]) cylinder(100, r=1.6, center = true);
+        translate([0, 0, 0]) rotate([90,0,0]) cylinder(100, r=1.6, center = true);
         x = -7 - LM10UU_r - 1;
         
         translate([0, x, -1]) cube([14,14,l+3], center = true);
@@ -79,8 +108,6 @@ module corner(){
     translate([-10, -10, LM10UU_l+2.3]) cube([20,10, 0.3]);
     
 }
-
-//corner();
 
 module middle(){
     lg_d = 2;
@@ -183,20 +210,20 @@ module middle2(){
 }
 
 module xy(l, x){
-    l_tige = l+25;
+    l_tige = l-15;
     echo("longueur tige ", l_tige);
     translate([0,-l/2,0]) rotate([90, 0, 90])corner();
     mirror([0,1,0]) translate([0,-l/2,0]) rotate([90, 0, 90])corner();
-    translate([0, x, -2*tige_r-1])rotate([-90,0,0])middle();
-    %translate([tige_esp/2,-l_tige/2,-2*tige_r-1]) rotate([-90,0,0])cylinder(r=5,l_tige);
-    %translate([-tige_esp/2,-l_tige/2,-2*tige_r-1]) rotate([-90,0,0])cylinder(r=5,l_tige);
+    translate([0, x, -2*tige_r-1])rotate([-90,0,0])middle2();
+    for(i = [1,-1]){
+        %translate([i*tige_esp/2,-l_tige/2,-3*tige_r-3]) rotate([-90,0,0])cylinder(r=5,l_tige);
+    }
 }
 
 
 
 fan_pt1 = [7, 45,  0];
 fan_pt2 = [50, 7,  0];
-e=1;
 module radial_fan_out(){
     difference(){
         union(){
@@ -225,11 +252,19 @@ module radial_fan_out(){
 }
 
 
-if(false){
-    //corner();
-} else {
+i = 4;
+if(i == 0){
     xy(200);
+} else if(i == 1){
+    corner();
+} else if(i == 2){
+    middle2(true);
+} else if(i == 3){
+    support_fan_radial();
+} else if(i == 4){
+    rotate([-180,0,0])vent_fan_radial(44);
 }
+
 
 //corner();
 //translate([0,90+2,0]) mirror([0,1,0]) corner();
