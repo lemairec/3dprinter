@@ -185,11 +185,11 @@ module middle(fan =true){
     %translate([0,-13,0]) rotate([90,0,0]) titan_extruder();
     //%translate(pt_fan) rotate([90,0,0]) fan_40();
     
-    if(true){
-        angle = 20;
+    if(fan){
+        angle = -20;
         x = 22;
-        %translate([-tige_esp/2-x+1, 35, -5]) mirror([1,0,0])rotate([90,0,-angle]) fan_radial();
-        translate([-tige_esp/2-x, 37, -7]) mirror([1,0,0])rotate([0,0,-90-angle])radial_fan_out();
+        %translate([-tige_esp/2-x+1, 35, +9]) rotate([90,180,-angle]) fan_radial();
+        translate([-tige_esp/2-x, 37, +11]) rotate([180,0,-90-angle])radial_fan_out();
     }
 }
 
@@ -219,7 +219,7 @@ module middle2(fan = true){
     
     if(fan){
         translate([x_fan, -13, -0]) mirror([1,0,0])rotate([90,-90,0]) support_fan_radial();;
-        translate([x_fan, -10, -0]) mirror([1,0,0])rotate([90,-90,0]) radial_fan_out();
+        translate([x_fan, -10, -0]) mirror([1,0,0])rotate([90,-90,0]) vent_fan_radial(44);
     }
     // %translate([-tige_esp/2-25, 15, 10]) mirror([1,0,0])rotate([180,0,-60]) fan_radial();
 }
@@ -229,15 +229,15 @@ module xy(l, x = 0){
     echo("longueur tige ", l_tige);
     translate([0,-l/2,0]) rotate([90, 0, 90])corner();
     mirror([0,1,0]) translate([0,-l/2,0]) rotate([90, 0, 90])corner();
-    translate([0, x, -2*tige_r-1])rotate([-90,0,0])middle2();
+    translate([0, x, -2*tige_r-1])rotate([-90,0,0])middle();
     %translate([tige_esp/2,-l_tige/2,-2*tige_r-1]) rotate([-90,0,0])cylinder(r=5,l_tige);
     %translate([-tige_esp/2,-l_tige/2,-2*tige_r-1]) rotate([-90,0,0])cylinder(r=5,l_tige);
 }
 
 fan_pt1 = [7, 45,  0];
 fan_pt2 = [50, 7,  0];
-fan_pt3 = [16, -44,  9.5];
-angle = -30;
+fan_pt3 = [20, -46,  0];
+angle = -50;
 
 r1 = 3;
 module radial_fan_out(){
@@ -245,7 +245,7 @@ module radial_fan_out(){
         union(){
             hull(){
                 cube([25, e ,19]);
-                translate(fan_pt3) rotate([0,0,angle]) cylinder(r=r1+e, 19, center = true);
+                translate(fan_pt3) rotate([0,0,angle]) cylinder(r=r1+e, 19);
             }
             hull(){
                 cube([25, e ,e]);
@@ -260,15 +260,15 @@ module radial_fan_out(){
         translate(fan_pt2) m3(10, center=true);
         hull(){
             translate([2.5, -1, 2])cube([20, 5 ,19-2*e]);
-            translate(fan_pt3) cylinder(r=r1, 19-2*e, center = true);
+            translate(fan_pt3) translate([0,0,e])cylinder(r=r1, 19-2*e);
         } 
-        translate(fan_pt3) rotate([0,0,-90+angle]) translate([0,-r1,-9.5+e])cube([2*r1,2*r1,19-2*e]);
+        translate(fan_pt3) rotate([0,0,-90+angle]) translate([0,-r1,e])cube([2*r1,2*r1+1,19-2*e]);
         translate([2.5-1, -1, 2+6])cube([2, 5 ,2]);
     }
 }
 
 
-i = 2;
+i = 3;
 if(i == 0){
     xy(200);
 } else if(i == 1){
@@ -278,7 +278,9 @@ if(i == 0){
     //middle();
 } else if(i == 3){
     radial_fan_out();
-    %radial_fan_out2();
+    
+    //support_fan_radial();;
+    //vent_fan_radial(44);
 } else if(i == 4){
     rotate([-180,0,0])vent_fan_radial(44);
 }
