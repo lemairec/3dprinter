@@ -66,5 +66,5 @@ module ramps_fan_mount(width = 64, height = 40, depth = 10, fanDia = 40, fanHole
 
 }
 
-
-ramps_fan_mount($fn = 32);
+ramps_fan_mount_cutoff_cube(80, 40, 10);
+ramps_fan_mount(fanDia= 72,  fanHoleDia = 3.1, fanHoleDist = 70, $fn = 32);

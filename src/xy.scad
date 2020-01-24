@@ -268,7 +268,7 @@ module radial_fan_out(){
 }
 
 
-i = 3;
+i = 0;
 if(i == 0){
     xy(200);
 } else if(i == 1){
